@@ -7,10 +7,10 @@ This script's purpose is to generate the list of components combined in the comp
 The generated content is shown in the console output.
 
 # Usage
-```python wix_xml_component_gen.py -d {DIRECTORY_WITH_FILES} -e {YOUR_EXTENSIONS_NAME}```
+```python wix_xml_component_gen.py -d {DIRECTORY_WITH_FILES} -e {YOUR_EXTENSIONS_NAME} -s {SOLUTION_DIRECTORY}```
 
 It is possible to pass several values as arguments, example:
 
-```python wix_xml_component_gen.py -d C:\dir1 C:\dir2 -e exe manifest config```
+```python wix_xml_component_gen.py -s C:\ProjectName\ -d C:\dir1 C:\dir2 -e exe manifest config```
 
 Modify **extensionIdDict** dictionary to add or change IDs of ComponentGroup dedicated for different type of files.
