@@ -23,8 +23,12 @@ def indent(elem, level=0):
     if level and (not elem.tail or not elem.tail.strip()):
       elem.tail = i
 
-def generateComponentGroup(dirPath,_id,extension):
-	componentGroupAtt = {"Id":_id,"Directory":"INSTALLFOLDER","Source":dirPath}
+def generateComponentGroup(dirPath,solDir,_id,extension):
+	if (solDir == dirPath[:len(solDir)]):
+		sourceDir = "$(var.SolutionDir)" + dirPath[len(solDir):]
+	else:
+		sourceDir = dirPath
+	componentGroupAtt = {"Id":_id,"Directory":"INSTALLFOLDER","Source":sourceDir}
 	componentGroup = Element("ComponentGroup",attrib=componentGroupAtt)
 	fileList = [f for f in listdir(dirPath) if (isfile(join(dirPath,f)) and (splitext(f)[1])==extension)]
 	
@@ -44,7 +48,7 @@ def generateComponentGroup(dirPath,_id,extension):
 
 def generateFragment(componentGroup):
 	fragment = Element("Fragment")
-	fragment.append(componentElement)
+	fragment.append(componentGroup)
 	return fragment
 
 def generateFragment(componentGroupList):
@@ -99,18 +103,22 @@ def main(**kwargs):
 	ext = []
 	directory = []
 	componentGroupList = []
-
+	solutionDir = ""
+	targetProjectName = ""
 	for key, val in kwargs.items():
 		if (key=="extension"):
 			ext = val
 		elif (key=="dir"):
 			directory=val
+		elif (key=="sdir"):
+			solutionDir=val
+			
 	try:		
 		for xt in ext:
 			xt = "."+xt
 			_id = extensionIdDict[xt]
 			for d in directory:
-				c = generateComponentGroup(d,_id,xt)
+				c = generateComponentGroup(d,solutionDir,_id,xt)
 				if (c != None):
 					componentGroupList.append(c)
 		
@@ -130,5 +138,6 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Python script for generating some of the parts of the WiX xml config file.")
 	parser.add_argument("-d", "--dir", nargs='+', required=True, help="set the directory of the target files")
 	parser.add_argument("-e", "--ext", nargs='+', required=True, help="file extensions to add to the configuration")
+	parser.add_argument("-s", "--sdir", required=True, help="target solution directory")
 	args = parser.parse_args()
-	main(dir=args.dir, extension=args.ext)
+	main(dir=args.dir, extension=args.ext, sdir=args.sdir)
